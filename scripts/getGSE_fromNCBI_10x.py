@@ -337,21 +337,13 @@ if __name__ == "__main__":
                 uid_processed.append(line.strip())
     else:
         print("No processed uids")
+# Note: if you are searching for chip-seq/atac-seq some other non expression
+# the esearch suffix has to be changed
 
     prefix='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
     esearch_gds='esearch.fcgi?db=gds&term='
     esearch_suffix ='+AND+expression+profiling+by+high+throughput+sequencing[DataSet%20Type]&retmax=5000'
-#'&usehistory=y'
 
-### first search "single+cell+RNA%2dseq"
-#    term='"single+cell+RNA%2dseq"'
-#    esearch_ncbi(esearch_gds+term+esearch_suffix)
-#    print("After first search hits",str(len(uid_list)))
-#
-### second search "single+cell+RNAdseq"
-#    term='"single+cell+RNAseq"'
-#    esearch_ncbi(esearch_gds+term+esearch_suffix)
-#    print("After second search hits",str(len(uid_list)))
 ############################# Query terms #########################
 ###################################################################
 ## queries to search
@@ -385,9 +377,11 @@ if __name__ == "__main__":
     if len(uid_toprocess)==0:
         print("Nothing new to process")
         exit()
-    #for i in uid_toprocess:
-    #    print(i)
-    #exit()
+
+# if for some reason a uid fails -> rerun -> it will resume:
+# will download only uids that are not completed
+# if the same uid fails again, you might want to add to add it to
+# finished uid list
 
     start=0
     step=30
