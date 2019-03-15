@@ -1,6 +1,25 @@
 #!/usr/bin/python3
-import os,time, urllib.request, tarfile, textwrap
+import os,sys,time, urllib.request, tarfile, textwrap
 import xml.etree.ElementTree as ET
+
+class ErrorOutputHandler:
+    def __init__(self):
+        pass
+
+    def write_log(self, string):
+        # print stdout/stderr to console
+        print(string)
+        # write error to file
+        log_file = open("log.txt","a")
+        log_file.write("[",time.strftime("%Y-%m-%d_%H-%M-%S")+"]\n",sep="\t")
+        log_file.write(str(string)+"\n")
+        log_file.close()
+
+original_stderr = sys.stderr # stored in case want to revert
+originial_stdout = sys.stdout
+
+sys.stderr = ErrorOutputHandler()
+sys.stdout = ErrorOutputHandler()
 
 def parse_familyxml(file,gse,gsmid_processed):#,gsmfile):
     outfile = open("sc_protocol_rnaseq.tsv",'a')
@@ -74,7 +93,7 @@ def parse_familyxml(file,gse,gsmid_processed):#,gsmfile):
                              molecule+"\t"+\
                             protocol+"\t"+\
                             dataprocess+"\t"+\
-                              biosample+"\t"+srx+"\t"+"\n" 
+                              biosample+"\t"+srx+"\t"+"\n"
             if libstrat == "RNA-Seq":
                 outfile.write(out_line)
             outfile1.write(out_line)
@@ -143,7 +162,7 @@ def parse_protocol(ftplink):
         out.close()
         return("",[])
     out.close()
- 
+
 
 def find_library_prep(title,abstract,protocol):
     library = {
@@ -294,16 +313,26 @@ def parse_esummary(root):
             outhandle.write(gse+"\n")
             outhandle.close()
             print(gse,"No new GSMs")
-    print("\n===========")        
-        
+    print("\n===========")
+
     outfile.close()
     outfile2.close()
     outfile1.close()
 
 def esearch_ncbi(esearch):
+# function to search gds based on query term & return xml
+
     global uid_list
     global prefix
-    esearch = urllib.request.urlopen(prefix+esearch)
+    try:
+        esearch = urllib.request.urlopen(prefix+esearch)
+    except urllib.error.URLError:
+        #ResponseData = e.read().decode("utf-8", 'ignore')
+        print("URL Error occured! Check connection\n",file=sys.stderr)
+        return
+    except urllib.error.HTTPerror():
+        print("HTTP Error occured! Check URL\n",file=sys.stderr)
+        return
     esearch.xml = esearch.read().decode('utf-8')
     root  = ET.fromstring(esearch.xml)
 
@@ -317,10 +346,17 @@ def esearch_ncbi(esearch):
         if id.text.strip() not in uid_list:
             uid_list.append(id.text.strip())
 
-################# main funtion##########3
+
+################# main funtion###############
 if __name__ == "__main__":
 
-    print ("Start : %s" % time.ctime())
+    #print ("Start : %s" % time.ctime(),file=sys.stdout)
+    preface = """
+###############################################
+START: {time}
+"""
+    print(preface.format(time = time.ctime()),file=sys.stdout)
+
 
     uid_list = []
     uid_processed = []
@@ -330,13 +366,13 @@ if __name__ == "__main__":
     gsmfile="completed_gsm.txt"
 
     if os.path.exists(uidfile):
-        print("Existing uid file found")
+        print("Existing uid file found",file=sys.stdout)
         uid_finished = open(uidfile)
         for line in uid_finished:
             if line!="" and line != "\n":
                 uid_processed.append(line.strip())
     else:
-        print("No processed uids")
+        print("No processed uids",file=sys.stdout)
 # Note: if you are searching for chip-seq/atac-seq some other non expression
 # the esearch suffix has to be changed
 
@@ -357,8 +393,10 @@ if __name__ == "__main__":
     ]
     i=1
     for term in query_terms:
+        print("Searching",i,"query:",file=sys.stdout)
         esearch_ncbi(esearch_gds+term+esearch_suffix)
-        print("After",i,"search hits",str(len(uid_list)))
+        print("After",i,"search hits",str(len(uid_list)),file=sys.stdout)
+        time.sleep(3)
         i=i+1
 
 #################################################################

@@ -1,0 +1,46 @@
+args = commandArgs(trailingOnly=TRUE)
+if (length(args)!=2)
+{
+  stop("Usage: Rscript script.R <GSEid txt file> <outputname>", call.=FALSE)
+}
+if (!file.exists(args[1]))
+{
+  stop("Input file not found!\
+Usage: Rscript script.R <GSEid txt file> <outputname>", call.=FALSE)
+}
+
+
+suppressPackageStartupMessages({
+  library(GEOquery)
+  library(data.table)
+})
+
+getGSEname = function(srr,id){
+  gds <- getGEO(id)
+  df = data.frame(srr=srr,
+                  gsm=id,
+                  gse=Meta(gds)$series_id,
+                  title=Meta(gds)$title,
+                  source_name=Meta(gds)$source_name_ch1,
+                  #gender= gsub(' ',"",tstrsplit(Meta(gds)$characteristics_ch1[[1]],":")[[2]]),
+                  charecteristics=paste(Meta(gds)$characteristics_ch1,collapse = ","),
+		          #description = Meta(gds)$description,
+                  species = Meta(gds)$organism_ch1
+                  )
+  return(df)
+}
+
+#l = c("GSM2179767","GSM2258360")
+l = read.table(args[1],col.names = c("srr","gsm"),stringsAsFactors = F,sep="\t")
+head(l)
+
+d = data.frame(srr=NULL,gsm=NULL,gse=NULL,title=NULL,source_name=NULL,charecteristics=NULL,
+               #description=NULL,
+               species=NULL)
+for(i in 1:nrow(l)){
+  srr=l[i,1]
+  gse=l[i,2]
+  cat(srr,gse,"\n")
+  d = rbind(d,getGSEname(srr,gse))
+}
+write.table(d,file = paste0(args[2],"_srrgsedetails.tsv"),sep = "\t",quote = F,row.names = F)
