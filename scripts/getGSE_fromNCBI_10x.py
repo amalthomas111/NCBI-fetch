@@ -1,25 +1,13 @@
 #!/usr/bin/python3
 import os,sys,time, urllib.request, tarfile, textwrap
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET, logging
+from helper import *
 
-class ErrorOutputHandler:
-    def __init__(self):
-        pass
+stdout_logger = logging.getLogger('STDOUT')
+sys.stdout = StreamToLogger(stdout_logger, logging.INFO)
 
-    def write_log(self, string):
-        # print stdout/stderr to console
-        print(string)
-        # write error to file
-        log_file = open("log.txt","a")
-        log_file.write("[",time.strftime("%Y-%m-%d_%H-%M-%S")+"]\n",sep="\t")
-        log_file.write(str(string)+"\n")
-        log_file.close()
-
-original_stderr = sys.stderr # stored in case want to revert
-originial_stdout = sys.stdout
-
-sys.stderr = ErrorOutputHandler()
-sys.stdout = ErrorOutputHandler()
+stderr_logger = logging.getLogger('STDERR')
+sys.stderr = StreamToLogger(stderr_logger, logging.ERROR)
 
 def parse_familyxml(file,gse,gsmid_processed):#,gsmfile):
     outfile = open("sc_protocol_rnaseq.tsv",'a')
@@ -99,20 +87,20 @@ def parse_familyxml(file,gse,gsmid_processed):#,gsmfile):
             outfile1.write(out_line)
     outfile.close()
     outfile1.close()
-    print("\tparsing family tree done")
+    print("\tparsing family tree done",file=sys.stdout)
     return ";".join(uniq_protocol), gsmid_new
 
 
-def unzip_tar(file,path):
-    if tarfile.is_tarfile(file):
-        if not os.path.exists(file.strip(".tgz")):
-            tar = tarfile.open(file,"r:gz")
+def unzip_tar(tgzfile,path):
+    if tarfile.is_tarfile(tgzfile):
+        if not os.path.exists(tgzfile.strip(".tgz")):
+            tar = tarfile.open(tgzfile,"r:gz")
             tar.extractall(path)
             tar.close()
-        print("\tparsing",file.strip(".tgz"))
+        print("\tparsing "+tgzfile.strip(".tgz"),file=sys.stdout)
         return(True)
     else:
-        print("\t",file,"not a tar file")
+        print("\t "+ tgzfile + "not a tar file",file=sys.stdout)
         return(False)
 
 
@@ -122,7 +110,7 @@ def parse_protocol(ftplink):
     #gsmfile = "completed_gsm.txt"
     exist = False
     if os.path.exists(gsmfile):
-        print("\tFound processed gsmid file")
+        print("\tFound processed gsmid file",file=sys.stdout)
         gsmin = open(gsmfile)
         for line in gsmin:
             if line!="" and line != "\n":
@@ -142,22 +130,22 @@ def parse_protocol(ftplink):
     if not os.path.exists(file):
         try:
             urllib.request.urlretrieve(protocol_link,file)
-            print("\tDownloaded protocol file")
+            print("\tDownloaded protocol file",file=sys.stdout)
         except (ValueError, urllib.error.URLError ):
-            print("=====================")
-            print("\t",basename,"file not found")
+            print("=====================",file=sys.stdout)
+            print("\t"+basename+" file not found",file=sys.stdout)
             print(ftplink)
-            print("=====================\n")
+            print("=====================\n",file=sys.stdout)
             out.write(basename+"\t"+ftplink+"\n")
             out.close()
             return("",[])
     status = unzip_tar(file,saveDir)
     if(status or exist == True):
-        print("\tParsing family xml")
+        print("\tParsing family xml",file=sys.stdout)
         proto, l = parse_familyxml(file.strip(".tgz"),basename,gsmid_processed)#,gsmfile)
         return(proto,l)
     else:
-        print("\t",basename,"file not found")
+        print("\t"+basename+" file not found",file=sys.stdout)
         out.write(basename+"\t"+ftplink+"\n")
         out.close()
         return("",[])
@@ -226,13 +214,13 @@ def parse_esummary(root):
         for grandchild in child:
             if grandchild.tag == "Id":
                 uid = grandchild.text.strip()
-                print("\n===========\n",time.strftime("%d-%m-%Y %H:%M:%S",
-                                         time.localtime()),"\n",sep='')
-                print(uid)
+                print("\n===========\n"+ time.strftime("%d-%m-%Y %H:%M:%S",
+                                         time.localtime()) + "\n",file=sys.stdout)
+                print(uid,file=sys.stdout)
                 continue
             elif grandchild.tag == "Item" and grandchild.attrib["Name"] == "Accession":
                 gse=grandchild.text
-                print(gse)
+                print(gse,file=sys.stdout)
                 continue
             elif grandchild.tag == "Item" and grandchild.attrib["Name"] == "title":
                 title = grandchild.text.strip().replace('\n','').replace('\r','')
@@ -289,7 +277,7 @@ def parse_esummary(root):
                 #print(pubmedid)
 
         lib_prep = find_library_prep(title,abstract,uniq_protocol)
-        print("\tFinding which lib prep done")
+        print("\tFinding which lib prep done",file=sys.stdout)
         if lib_prep.find("10x") != -1:
             outfile1.write(str(uid)+"\t"+str(gse)+"\t"+str(srp)+"\t"+species+"\t"+
                       lib_prep+"\t"+str(noofsamples)+"\t"+str(ftplink)+"\t"+
@@ -312,8 +300,8 @@ def parse_esummary(root):
             outhandle = open("noGSE_forGSMS.txt",'a')
             outhandle.write(gse+"\n")
             outhandle.close()
-            print(gse,"No new GSMs")
-    print("\n===========")
+            print(gse+" No new GSMs",file=sys.stdout)
+    print("\n===========",file=sys.stdout)
 
     outfile.close()
     outfile2.close()
@@ -351,8 +339,7 @@ def esearch_ncbi(esearch):
 if __name__ == "__main__":
 
     #print ("Start : %s" % time.ctime(),file=sys.stdout)
-    preface = """
-###############################################
+    preface = """###############################################
 START: {time}
 """
     print(preface.format(time = time.ctime()),file=sys.stdout)
@@ -393,27 +380,28 @@ START: {time}
     ]
     i=1
     for term in query_terms:
-        print("Searching",i,"query:",file=sys.stdout)
+        print("Searching "+str(i)+" query:",file=sys.stdout,sep="")
         esearch_ncbi(esearch_gds+term+esearch_suffix)
-        print("After",i,"search hits",str(len(uid_list)),file=sys.stdout)
-        time.sleep(3)
+        print("After "+str(i)+" search hits  " + str(len(uid_list)),file=sys.stdout,sep="")
+        time.sleep(5)
         i=i+1
+    time.sleep(5)
 
 #################################################################
 
     uid_toprocess = list(set(uid_list) - set(uid_processed))
+    #uid_toprocess = uid_toprocess[0:35]
 
 #print("Count:",str(count))
 #print("Retmax:",str(retmax))
 #print("QueryKey:",query_key)
 #print("WebEnv:",webenv)
-    print("No of uids in search:",len(uid_list))
-    print("No of uids already processed:", len(uid_processed))
-    print("No of uids to process:", len(uid_toprocess))
-#print(uid_list)
+    print("No of uids in search:"+str(len(uid_list)))
+    print("No of uids already processed:" + str(len(uid_processed)))
+    print("No of uids to process:" + str(len(uid_toprocess)))
 
     if len(uid_toprocess)==0:
-        print("Nothing new to process")
+        print("Nothing new to process",file=sys.stdout)
         exit()
 
 # if for some reason a uid fails -> rerun -> it will resume:
@@ -429,7 +417,7 @@ START: {time}
         end = start +step
         if end > len(uid_toprocess):
             end= len(uid_toprocess)
-        print("start=",start,"end=",end)
+        print("start="+str(start)+" end="+str(end),file=sys.stdout)
         queryids = ','.join(uid_toprocess[start:end])
         url = prefix + "esummary.fcgi?db=gds&id=" + queryids
         esummary =  urllib.request.urlopen(url)
@@ -440,4 +428,4 @@ START: {time}
         #exit(0)
 
 
-    print ("End : %s" % time.ctime())
+    print ("End : %s" % time.ctime(),file = sys.stdout)
