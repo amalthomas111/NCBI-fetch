@@ -1,13 +1,22 @@
 #!/usr/bin/python3
-import os,sys,time, urllib.request, tarfile, textwrap
+import os,sys,time, urllib.request, tarfile, json
 import xml.etree.ElementTree as ET, logging
 from helper import *
 
+print("\nAll STDOUT & STDERR are logged in log.txt file\n")
 stdout_logger = logging.getLogger('STDOUT')
 sys.stdout = StreamToLogger(stdout_logger, logging.INFO)
 
 stderr_logger = logging.getLogger('STDERR')
 sys.stderr = StreamToLogger(stderr_logger, logging.ERROR)
+
+if len(sys.argv) != 2:
+    print("python3 <script> <jsonfile(file with query terms)>\n Exiting!!!!\n")
+    exit(0)
+
+if not os.path.exists(sys.argv[1]):
+    print("Input file not found\nExiting!!\n")
+    exit(0)
 
 def parse_familyxml(file,gse,gsmid_processed):#,gsmfile):
     outfile = open("sc_protocol_rnaseq.tsv",'a')
@@ -46,7 +55,10 @@ def parse_familyxml(file,gse,gsmid_processed):#,gsmfile):
                         elif i.tag == minxml_prefix+"Organism":
                             organism = i.text.strip()
                         elif i.tag == minxml_prefix+"Characteristics":
-                            charecteristic_tag.append(i.attrib["tag"].strip()+":"+i.text.strip())
+                            try:
+                                charecteristic_tag.append(i.attrib["tag"].strip()+":"+i.text.strip())
+                            except KeyError:
+                                 charecteristic_tag.append("NA"+":"+i.text.strip())
                         elif i.tag == minxml_prefix+"Growth-Protocol":
                             growth = i.text.strip().replace('\n', '').replace('\r','')
                         elif i.tag == minxml_prefix+"Molecule":
@@ -191,16 +203,18 @@ def parse_esummary(root):
         outfile = open(outputfile,"a")
     else:
         outfile = open(outputfile,"w")
-        outfile.write("uid\tgse\tsrp\tspecies\tlib_prep\tnoofsamples\tftplink\t"+
+        outfile.write("uid\tgse\tsrp\tspecies\tlib_prep\tnoofsamples\ttitle"+
+                      "\tftplink\t"+
                       "targetftplink\tpubmedid"+"\thumandata\tmousedata\t"+
-                      "otherdata\tgplid\ttitle\tabstract\n")
+                      "otherdata\tgplid\tabstract\n")
     if os.path.exists(uidfile):
         outfile1 = open(outputfile1,"a")
     else:
         outfile1 = open(outputfile1,"w")
-        outfile1.write("uid\tgse\tsrp\tspecies\tlib_prep\tnoofsamples\tftplink\t"+
+        outfile1.write("uid\tgse\tsrp\tspecies\tlib_prep\tnoofsamples\ttitle"+
+                       "\tftplink\t"+
                       "targetftplink\tpubmedid"+"\thumandata\tmousedata\t"+
-                      "otherdata\tgplid\ttitle\tabstract\n")
+                      "otherdata\tgplid\tabstract\n")
     outfile2 = open(uidfile,'a')
 
     for child in root:
@@ -280,15 +294,17 @@ def parse_esummary(root):
         print("\tFinding which lib prep done",file=sys.stdout)
         if lib_prep.find("10x") != -1:
             outfile1.write(str(uid)+"\t"+str(gse)+"\t"+str(srp)+"\t"+species+"\t"+
-                      lib_prep+"\t"+str(noofsamples)+"\t"+str(ftplink)+"\t"+
+                      lib_prep+"\t"+str(noofsamples)+"\t"+title+
+                      "\t"+str(ftplink)+"\t"+
                       targetftplink+"\t"+str(pubmedid)+"\t"+str(human)+"\t"+str(mouse)+"\t"+
-                      str(other)+"\t"+str(gplid)+"\t"+title+
-                      "\t"+abstract+"\n")
+                      str(other)+"\t"+str(gplid)+
+                           "\t"+abstract+"\n")
         #print(uid,gse,species,gplid)
         outfile.write(str(uid)+"\t"+str(gse)+"\t"+str(srp)+"\t"+species+"\t"+
-                      lib_prep+"\t"+str(noofsamples)+"\t"+str(ftplink)+"\t"+
+                      lib_prep+"\t"+str(noofsamples)+"\t"+title+
+                      "\t"+str(ftplink)+"\t"+
                       targetftplink+"\t"+str(pubmedid)+"\t"+str(human)+"\t"+str(mouse)+"\t"+
-                      str(other)+"\t"+str(gplid)+"\t"+title+
+                      str(other)+"\t"+str(gplid)+
                       "\t"+abstract+"\n")
         outfile2.write(uid+"\n")
         if len(gsmid_new) > 0:
@@ -371,21 +387,27 @@ START: {time}
 ###################################################################
 ## queries to search
 
-    query_terms = [
-    '"single+cell+RNA%2dseq"',
-        '"single+cell+RNAseq"','"scRNAseq"','"single-cell+RNAseq"',
-        '"singlecellRNAseq"','singlecell+RNAseq',"single_cell_rnaseq",
-        "singlecell_rnaseq"
+    #query_terms = [
+    #'"single+cell+RNA%2dseq"',
+    #    '"single+cell+RNAseq"','"scRNAseq"','"single-cell+RNAseq"',
+    #    '"singlecellRNAseq"','singlecell+RNAseq',"single_cell_rnaseq",
+    #    "singlecell_rnaseq"
 
-    ]
+    #]
+    #with open(sys.argv[1],"w") as filehandle:
+    #    json.dump(query_terms,filehandle)
+    #exit(0)
+    with open(sys.argv[1],"r") as filehandle:
+        query_terms = json.load(filehandle)
+    
     i=1
     for term in query_terms:
-        print("Searching "+str(i)+" query:",file=sys.stdout,sep="")
+        print(str(i)+":searching  query:"+term,file=sys.stdout,sep="")
         esearch_ncbi(esearch_gds+term+esearch_suffix)
         print("After "+str(i)+" search hits  " + str(len(uid_list)),file=sys.stdout,sep="")
         time.sleep(5)
         i=i+1
-    time.sleep(5)
+    #time.sleep(5)
 
 #################################################################
 
