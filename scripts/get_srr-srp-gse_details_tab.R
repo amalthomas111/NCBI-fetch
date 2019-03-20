@@ -11,8 +11,8 @@ Usage: Rscript script.R <srr-srp-gse id file> <outputname>", call.=FALSE)
 
 
 suppressPackageStartupMessages({
-  library(GEOquery)
-  library(data.table)
+  require(GEOquery)
+  require(data.table)
 })
 
 getGSEname = function(srr,gse,srp){
