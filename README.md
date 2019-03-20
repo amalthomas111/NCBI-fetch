@@ -7,8 +7,8 @@ mentioned in the input JSON file.
 Requirements:
 - Needs **active internet connection**
 - JSON input file: An input JSON file with query keywords (s) mentioned as a list. 
-This file also has the search URL prefix. Depending upon the data of interest 
-(RNA-seq/ChIP-Seq etc.) the prefix has to be changed.
+This file also has the search URL suffix part. Depending upon the data of interest 
+(RNA-seq/ChIP-Seq etc.) the suffix has to be changed.
 - `helper.py`: Some helper class/functions for the script are declared 
 in `helper.py` script.
 
