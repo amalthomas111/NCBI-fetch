@@ -1,8 +1,11 @@
-["\"single+cell+RNA%2dseq\"", 
+{
+"query_terms": ["\"single+cell+RNA%2dseq\"", 
 "\"single+cell+RNAseq\"", 
 "\"scRNAseq\"", 
 "\"single-cell+RNAseq\"", 
 "\"singlecellRNAseq\"", 
 "singlecell+RNAseq", 
 "single_cell_rnaseq"
-]
+],
+"esearch_suffix": "+AND+expression+profiling+by+high+throughput+sequencing[DataSet%20Type]&retmax=5000"
+}

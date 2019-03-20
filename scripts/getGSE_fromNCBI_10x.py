@@ -381,7 +381,6 @@ START: {time}
 
     prefix='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
     esearch_gds='esearch.fcgi?db=gds&term='
-    esearch_suffix ='+AND+expression+profiling+by+high+throughput+sequencing[DataSet%20Type]&retmax=5000'
 
 ############################# Query terms #########################
 ###################################################################
@@ -398,7 +397,9 @@ START: {time}
     #    json.dump(query_terms,filehandle)
     #exit(0)
     with open(sys.argv[1],"r") as filehandle:
-        query_terms = json.load(filehandle)
+        data = json.load(filehandle)
+        query_terms = data["query_terms"]
+        esearch_suffix = data["esearch_suffix"]
     
     i=1
     for term in query_terms:
