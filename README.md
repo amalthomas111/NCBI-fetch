@@ -3,8 +3,11 @@ Scripts to query &amp; search data from GEO
 
 getGSE_fromNCBI_10x.py: python3 script to search in NCBI GEO for keywords 
 mentioned in the input JSON file.
-The script requires an input JSON file with query keywords (s) mentioned as a list.
-Some helper class/functions for the script are declared in : helper.py script.
+
+Requirements:
+- Needs **active internet connection**
+- JSON input file: The script requires an input JSON file with query keywords (s) mentioned as a list.
+- helpy.py: Some helper class/functions for the script are declared in `helper.py` script.
 
 To run:
 ```
@@ -19,7 +22,10 @@ Generates the following outputs
  - Geo_10x_dataset.tsv : studies that from 10x chromium platform
  - uid_finished.txt: Query uids that are arleady fetched
 
-getgsedetails_srrorsrplist.sh: BASH script to get the metadata related to a SRR id or SRP id. Requirement:
+`getgsedetails_srrorsrplist.sh`: BASH script to get the metadata related to a SRR id or SRP id. 
+
+Requirements:
+- Nees **active internet connection**
 - Needs efetch/esearch from entrez-direct. Install via conda (```conda install -c bioconda entrez-direct```)
 - Needs get_srr-srp-gse_details_tab.R script in the path. This Rscript needs GEOquery &amp; data.table packages
 - SRR id or SRP id input file (one per line).
