@@ -7,7 +7,7 @@ mentioned in the input JSON file.
 Requirements:
 - Needs **active internet connection**
 - JSON input file: The script requires an input JSON file with query keywords (s) mentioned as a list.
-- helpy.py: Some helper class/functions for the script are declared in `helper.py` script.
+- `helper.py`: Some helper class/functions for the script are declared in `helper.py` script.
 
 To run:
 ```
@@ -25,17 +25,17 @@ Generates the following outputs
 `getgsedetails_srrorsrplist.sh`: BASH script to get the metadata related to a SRR id or SRP id. 
 
 Requirements:
-- Nees **active internet connection**
+- Needs **active internet connection**
 - Needs efetch/esearch from entrez-direct. Install via conda (```conda install -c bioconda entrez-direct```)
 - Needs get_srr-srp-gse_details_tab.R script in the path. This Rscript needs GEOquery &amp; data.table packages
 - SRR id or SRP id input file (one per line).
 
-E.g. command to get metadata of SRR ids:
+An e.g. command to get metadata for SRR ids is:
 ```
 bash getgsedetails_srrorsrplist.sh srrid.txt SRR mysrrinformation
 ```
 
-E.g. command to get metadata of SRP ids:
+An e.g. command to get metadata for SRP ids is:
 ```
 bash getgsedetails_srrorsrplist.sh srpids.txt SRP mysrrinformation
 ```
