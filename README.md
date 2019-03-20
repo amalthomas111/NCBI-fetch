@@ -2,7 +2,7 @@
 Scripts to query &amp; search data from GEO
 
 getGSE_fromNCBI_10x.py: python3 script to search in NCBI GEO for keywords 
-related to single-cell RNAseq.
+mentioned in the input JSON file.
 The script requires an input JSON file with query keywords (s) mentioned as a list.
 Some helper class/functions for the script are declared in : helper.py script.
 
