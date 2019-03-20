@@ -19,5 +19,20 @@ Generates the following outputs
  - Geo_10x_dataset.tsv : studies that from 10x chromium platform
  - uid_finished.txt: Query uids that are arleady fetched
 
-getgsedetails_fromsrr.sh: BASH script to get the metadata related to a SRR id. Needs get_srr-srp-gse_details_tab.R script.
+getgsedetails_srrorsrplist.sh: BASH script to get the metadata related to a SRR id or SRP id. Requirement:
+- Needs efetch/esearch from entrez-direct. Install via conda (```conda install -c bioconda entrez-direct```)
+- Needs get_srr-srp-gse_details_tab.R script in the path. This Rscript needs GEOquery &amp; data.table packages
+- SRR id or SRP id input file (one per line).
+
+E.g. command to get metadata of SRR ids:
+```
+bash getgsedetails_srrorsrplist.sh srrid.txt SRR mysrrinformation
+```
+
+E.g. command to get metadata of SRP ids:
+```
+bash getgsedetails_srrorsrplist.sh srpids.txt SRP mysrrinformation
+```
+<!---
 get10xnewLibs.sh takes the output files and find new 10x studies that are not present in our collection
+-->
