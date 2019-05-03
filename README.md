@@ -18,7 +18,7 @@ python3 getGSE_fromNCBI_10x.py <input json file>
 ```
 
 
-Generates the following outputs
+Generates the following outputs:
  - Geo_sc_Datasets.tsv : Information about studies that are found by esearch.
  - Geo_10x_dataset.tsv : studies from 10x chromium platform.
  - log.txt: STDOUT &amp; STDERR streams.
@@ -36,7 +36,7 @@ Requirements:
 Install via conda (```conda install -c bioconda entrez-direct```).
 - Needs `get_srr-srp-gse_details_tab.R` script in the path. This Rscript 
 needs GEOquery &amp; data.table packages.
-- SRR id or SRP id input file (one per line).
+- SRR id(s) or SRP id(s) input file (one per line).
 
 An e.g. command to get metadata for SRR ids is:
 ```
