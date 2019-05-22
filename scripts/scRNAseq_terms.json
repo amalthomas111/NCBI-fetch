@@ -8,6 +8,7 @@
 "single_cell_rnaseq",
 "\"single-cell+transcriptome\"",
 "\"singlecell+transcriptome\""
+"\"single-cell+transcript\""
 ],
 "esearch_suffix": "+AND+expression+profiling+by+high+throughput+sequencing[DataSet%20Type]&retmax=5000"
 }
