@@ -42,6 +42,6 @@ echo "tempdir:${tempdir}"
 cd $tempdir
 split -l 1  ${path}/${1}.temp
 ls -1 x*|while read i;do cat $i|while read j;do srr=$j; esearch -db sra -query $srr|efetch -format runinfo|sed '1d'|grep $srr |cut -d',' -f 1,30,21|sed '/^$/d'|tr "," "\t"  >> ${path}/${3}.srr_srp_gsmid.txt;done;done
+rm -rf ${1}.temp
 cd ${path}
 Rscript ${rscriptpath} ${3}.srr_srp_gsmid.txt $3
-rm -rf ${1}.temp

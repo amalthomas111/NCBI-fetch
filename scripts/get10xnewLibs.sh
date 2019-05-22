@@ -21,7 +21,7 @@ human_srp="finished_human_srps.txt"
 human_analysis_path_HPC=/home/cmb-06/as/desenabr/scream/db/hg38/analyses
 
 if [ ! -f ${human_srp} ]; then
-        echo "Finished human srp found! Creating SRP from HPC path"
+        echo "Finished human srp list not found! Creating SRP from HPC path"
         ls -1 ${human_analysis_path_HPC}|cut -d_ -f1 | sort -u | grep SRP > \
                 finished_human_srps.txt
 fi
@@ -30,7 +30,7 @@ fi
 mouse_srp="finished_mouse_srps.txt"
 mouse_analysis_path_HPC=/home/cmb-06/as/desenabr/scream/db/mm10/analyses
 if [ ! -f ${mouse_srp} ]; then
-        echo "Finished mouse srp found! Creating SRP from HPC path"
+        echo "Finished mouse srp list not found! Creating SRP from HPC path"
         ls -1 ${mouse_analysis_path_HPC}|cut -d_ -f1 | sort -u | grep SRP > \
                 finished_mouse_srps.txt
 fi
@@ -159,7 +159,7 @@ fi
 human_output=newhuman_10xbam_SRPsnobam_${date}.txt
 mouse_output=newmouse_10xbam_SRPsnobam_${date}.txt
 humanmouse_output=newhumanmouse_10xbam_SRPsnobam_${date}.txt
-script=/home/rcf-40/amalthom/panfs/software/myexec/getgsedetails_srrorsrplist.sh
+script=getgsedetails_srrorsrplist.sh
 if [ ! -f ${script} ]; then
         echo "bash script for SRR/GSM details not found!Exiting!"
         exit
