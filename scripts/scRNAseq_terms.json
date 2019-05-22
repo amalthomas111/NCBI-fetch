@@ -5,7 +5,9 @@
 "\"single-cell+RNAseq\"", 
 "\"singlecellRNAseq\"", 
 "singlecell+RNAseq", 
-"single_cell_rnaseq"
+"single_cell_rnaseq",
+"\"single-cell+transcriptome\"",
+"\"singlecell+transcriptome\""
 ],
 "esearch_suffix": "+AND+expression+profiling+by+high+throughput+sequencing[DataSet%20Type]&retmax=5000"
 }
