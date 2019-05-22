@@ -18,12 +18,27 @@ ncbi_fetch=$1
 
 #finished human srp file
 human_srp="finished_human_srps.txt"
+human_analysis_path_HPC=/home/cmb-06/as/desenabr/scream/db/hg38/analyses
+
+if [ ! -f ${human_srp} ]; then
+        echo "Finished human srp found! Creating SRP from HPC path"
+        ls -1 ${human_analysis_path_HPC}|cut -d_ -f1 | sort -u | grep SRP > \
+                finished_human_srps.txt
+fi
 
 #finished mouse srp file
 mouse_srp="finished_mouse_srps.txt"
+mouse_analysis_path_HPC=/home/cmb-06/as/desenabr/scream/db/mm10/analyses
+if [ ! -f ${mouse_srp} ]; then
+        echo "Finished mouse srp found! Creating SRP from HPC path"
+        ls -1 ${mouse_analysis_path_HPC}|cut -d_ -f1 | sort -u | grep SRP > \
+                finished_mouse_srps.txt
+fi
 
 #finished humanmouse srp file
 humanmouse_srp="finished_humanmouse_srps.txt"
+cat ${human_srp} ${mouse_srp} |sort -u > finished_humanmouse_srps.txt
+
 
 date=$(date +%Y-%m-%d)
 tempdir="other"
