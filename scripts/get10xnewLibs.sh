@@ -54,7 +54,8 @@ grep "Homo sapiens" ${ncbi_fetch} |grep -v "Mus musculus" > \
 grep "Homo sapiens" ${ncbi_fetch} |grep "Mus musculus" > \
                                 ${tempdir}/Geo_10x_dataset_humanmouse.tsv
 else
-        echo "ncbi fetch outputfile not found! Exiting"
+        echo "ncbi fetch outputfile (Geo_10x_dataset.tsv) not found!"
+        echo "First run python3 getGSE_fromNCBI_10x.py. Exiting!" 
         exit
 fi
 
