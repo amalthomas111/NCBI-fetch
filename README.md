@@ -47,13 +47,13 @@ An e.g. command to get metadata for SRP ids is:
 ```
 bash getgsedetails_srrorsrplist.sh srpids.txt SRP mysrrinformation
 ```
-[srapath](https://github.com/ncbi/sra-tools/wiki/Downloads) could be used to get the download link for the bamfile(s) that is uploaded as metadata file for a given SRP. For e.g.
+For a given SRP id, [srapath](https://github.com/ncbi/sra-tools/wiki/Downloads) could be used to get the download link of the processed BAM file(s) that is uploaded in the SRA. Latest sra-tools (v2.9.6 or above) is required for proper functioning. For e.g.
 ```
-srapath $SRPID -f names --raw -p typ=srapub_files  | \
+srapath SRP162688 -f names --raw -p typ=srapub_files  | \
                         grep srapub_files | cut '-d|' -f8|sed '/^$/d'| \
                         grep -e "bam" -e "BAM"
 ``` 
-`get10xnewLibs.sh` takes the output files (Geo_sc_Datasets.tsv or Geo_10x_dataset.tsv) and find new SRPs that are not already processed in the db. For the new SRPs, the script checks whether processed bam file is uploaded as metadata file using srapath. If yes URL of the bam file is outputed otherwise the SRRs under the SRPs are listed.
+If nothing is returned it means no BAM file is found in the SRA for the given SRP id. The script: `get10xnewLibs.sh` takes the output files (Geo_sc_Datasets.tsv or Geo_10x_dataset.tsv) as input and then finds new SRPs that are not processed in the database. For the new SRPs, the script checks whether processed BAM file(s) is uploaded in SRA using srapath. If yes, the URL of the bam file is outputed otherwise the SRRs under the SRPs are listed.
 <!---
 get10xnewLibs.sh takes the output files and find new 10x studies that are not present in our collection
 -->
